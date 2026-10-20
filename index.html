@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hari Santri 2026 - SD IT AL-IQRA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-emerald-50 min-h-screen text-slate-800 font-sans pb-12">
+
+  <!-- Header & Logo -->
+  <header class="bg-emerald-700 text-white shadow-lg py-4 px-6 mb-6">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <img src="logo-sekolah.png" alt="Logo Sekolah" class="h-16 w-16 object-contain bg-white rounded-full p-1">
+      <div class="text-center px-2">
+        <h1 class="text-xl md:text-2xl font-bold uppercase tracking-wide">Hari Santri Nasional 2026</h1>
+        <p class="text-sm md:text-base font-light text-emerald-100">SD IT AL-IQRA</p>
+      </div>
+      <img src="logo-hari-santri.png" alt="Logo Hari Santri" class="h-16 w-16 object-contain bg-white rounded-full p-1">
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <div class="max-w-5xl mx-auto mb-6 px-4">
+    <div class="flex justify-center space-x-2 md:space-x-4 bg-white p-2 rounded-xl shadow-md border border-emerald-100">
+      <button onclick="switchTab('pendaftaran')" id="btn-pendaftaran" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm md:text-base transition-all bg-emerald-600 text-white shadow">Pendaftaran</button>
+      <button onclick="switchTab('penilaian')" id="btn-penilaian" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm md:text-base transition-all text-emerald-800 hover:bg-emerald-100">Penilaian Juri</button>
+      <button onclick="switchTab('rekap'); loadRekap();" id="btn-rekap" class="nav-btn px-4 py-2 rounded-lg font-semibold text-sm md:text-base transition-all text-emerald-800 hover:bg-emerald-100">Rekap Juara</button>
+    </div>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4">
+    
+    <!-- SECTION 1: PENDAFTARAN -->
+    <section id="tab-pendaftaran" class="tab-content bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+      <h2 class="text-xl font-bold text-emerald-800 mb-4 border-b pb-2">Formulir Pendaftaran Peserta</h2>
+      <form id="formPendaftaran" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Nama Lengkap Santri</label>
+          <input type="text" id="nama" required placeholder="Masukkan nama murid" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Kelas</label>
+            <select id="kelas" onchange="updateLombaOptions()" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="Kelas 1">Kelas 1</option>
+              <option value="Kelas 2">Kelas 2</option>
+              <option value="Kelas 3">Kelas 3</option>
+              <option value="Kelas 4">Kelas 4</option>
+              <option value="Kelas 5">Kelas 5</option>
+              <option value="Kelas 6">Kelas 6</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Cabang Lomba</label>
+            <select id="kodeLomba" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition">Daftarkan Peserta</button>
+      </form>
+    </section>
+
+    <!-- SECTION 2: PENILAIAN JURI -->
+    <section id="tab-penilaian" class="tab-content hidden bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+      <h2 class="text-xl font-bold text-emerald-800 mb-4 border-b pb-2">Input Penilaian Juri</h2>
+      <form id="formPenilaian" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Nama Juri / Penguji</label>
+            <input type="text" id="juri" required placeholder="Nama ustaz / ustazah" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Pilih Cabang Lomba</label>
+            <select id="penilaianLomba" onchange="loadPesertaByLomba()" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="">-- Pilih Cabang Lomba --</option>
+              <option value="LMK">LMK - Mewarnai Kaligrafi (Kelas 1-2)</option>
+              <option value="LHQ">LHQ - Tahfizh (Kelas 1-6)</option>
+              <option value="LAZ">LAZ - Adzan & Iqomah (Kelas 1-6)</option>
+              <option value="LTQ">LTQ - Tilawatil Qur'an (Kelas 3-6)</option>
+              <option value="LPD">LPD - Pidato (Kelas 3-6)</option>
+              <option value="LSJ">LSJ - Sholat Berjama'ah (Kelas 3-6)</option>
+              <option value="LCC">LCC - Cerdas Cermat (Kelas 3-6)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-1">Pilih Peserta</label>
+          <select id="idPesertaPenilaian" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="">-- Pilih Lomba Terlebih Dahulu --</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Form Kriteria -->
+        <div id="containerKriteria" class="bg-emerald-50 p-4 rounded-lg border border-emerald-200 space-y-3">
+          <p class="text-sm text-slate-500 text-center">Pilih cabang lomba untuk menampilkan kriteria penilaian.</p>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-md transition">Simpan Nilai</button>
+      </form>
+    </section>
+
+    <!-- SECTION 3: REKAP JUARA -->
+    <section id="tab-rekap" class="tab-content hidden bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 border-b pb-2 gap-2">
+        <h2 class="text-xl font-bold text-emerald-800">Rekapitulasi Pemenang</h2>
+        <select id="filterRekapLomba" onchange="renderRekapTable()" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          <option value="ALL">Semua Cabang Lomba</option>
+          <option value="LMK">LMK - Mewarnai Kaligrafi</option>
+          <option value="LHQ">LHQ - Tahfizh</option>
+          <option value="LAZ">LAZ - Adzan & Iqomah</option>
+          <option value="LTQ">LTQ - Tilawatil Qur'an</option>
+          <option value="LPD">LPD - Pidato</option>
+          <option value="LSJ">LSJ - Sholat Berjama'ah</option>
+          <option value="LCC">LCC - Cerdas Cermat</option>
+        </select>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border">
+          <thead class="bg-emerald-700 text-white uppercase text-xs">
+            <tr>
+              <th class="p-3">Peringkat</th>
+              <th class="p-3">ID Peserta</th>
+              <th class="p-3">Nama Santri</th>
+              <th class="p-3">Kelas</th>
+              <th class="p-3">Lomba</th>
+              <th class="p-3">Total Nilai</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyRekap" class="divide-y">
+            <tr>
+              <td colspan="6" class="p-4 text-center text-slate-500">Memuat data rekap...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // MASUKKAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz2dZUXikhiZBCvqimpD6LiuIqHvK9qu89J2EFiqeDLo0rd3b2FFqyU_HT9uyQRkAcy4g/exec";
+
+    const lombaData = {
+      "LMK": { nama: "Mewarnai Kaligrafi", kat: ["Kelas 1", "Kelas 2"], kriteria: ["Gradasi Warna", "Kebersihan", "Kerapihan"] },
+      "LHQ": { nama: "Tahfizh", kat: ["Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Tahfizh", "Tajwid", "Irama", "Adab"] },
+      "LAZ": { nama: "Adzan & Iqomah", kat: ["Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Tajwid", "Irama", "Gestur"] },
+      "LTQ": { nama: "Tilawatil Qur'an", kat: ["Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Tajwid", "Irama", "Adab"] },
+      "LPD": { nama: "Pidato", kat: ["Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Tema & Materi", "Sistematika", "Penghayatan", "Ketepatan & Kefasihan Dalil"] },
+      "LSJ": { nama: "Sholat Berjama'ah", kat: ["Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Fi'liyah (Gerakan)", "Qouliyah (Bacaan)", "Kekompakkan", "Pakaian"] },
+      "LCC": { nama: "Cerdas Cermat", kat: ["Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"], kriteria: ["Nilai Akhir Cerdas Cermat"] }
+    };
+
+    let cachePeserta = [];
+    let cacheNilai = [];
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+        el.classList.add('text-emerald-800');
+      });
+
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`btn-${tabName}`);
+      activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow');
+    }
+
+    function updateLombaOptions() {
+      const kelas = document.getElementById('kelas').value;
+      const selectLomba = document.getElementById('kodeLomba');
+      selectLomba.innerHTML = '<option value="">-- Pilih Cabang Lomba --</option>';
+
+      if (!kelas) return;
+
+      Object.keys(lombaData).forEach(kode => {
+        if (lombaData[kode].kat.includes(kelas)) {
+          const opt = document.createElement('option');
+          opt.value = kode;
+          opt.textContent = `[${kode}] ${lombaData[kode].nama}`;
+          selectLomba.appendChild(opt);
+        }
+      });
+    }
+
+    document.getElementById('penilaianLomba').addEventListener('change', function() {
+      const kode = this.value;
+      const container = document.getElementById('containerKriteria');
+      container.innerHTML = '';
+
+      if (!kode || !lombaData[kode]) {
+        container.innerHTML = '<p class="text-sm text-slate-500 text-center">Pilih cabang lomba untuk menampilkan kriteria penilaian.</p>';
+        return;
+      }
+
+      lombaData[kode].kriteria.forEach((k, idx) => {
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between gap-2";
+        div.innerHTML = `
+          <label class="text-sm font-medium w-1/2">${k}</label>
+          <input type="number" id="k${idx+1}" min="0" max="100" required placeholder="0-100" class="w-1/2 border rounded p-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+        `;
+        container.appendChild(div);
+      });
+    });
+
+    async function loadPesertaByLomba() {
+      const kode = document.getElementById('penilaianLomba').value;
+      const selectPeserta = document.getElementById('idPesertaPenilaian');
+      selectPeserta.innerHTML = '<option value="">Memuat data peserta...</option>';
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'get_data' })
+        });
+        const res = await response.json();
+        if (res.status === 'success') {
+          cachePeserta = res.peserta;
+          cacheNilai = res.nilai;
+
+          const filtered = cachePeserta.filter(p => p.kodeLomba === kode);
+          selectPeserta.innerHTML = '<option value="">-- Pilih Peserta --</option>';
+          filtered.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.id} - ${p.nama} (${p.kelas})`;
+            selectPeserta.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        selectPeserta.innerHTML = '<option value="">Gagal memuat peserta</option>';
+      }
+    }
+
+    document.getElementById('formPendaftaran').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const kode = document.getElementById('kodeLomba').value;
+      const payload = {
+        nama: document.getElementById('nama').value,
+        kelas: document.getElementById('kelas').value,
+        kodeLomba: kode,
+        namaLomba: lombaData[kode].nama
+      };
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'daftar', payload })
+        }).then(r => r.json());
+
+        if(res.status === 'success') {
+          alert(`Pendaftaran Berhasil!\nID Peserta: ${res.idPeserta}`);
+          this.reset();
+        }
+      } catch(err) {
+        alert('Gagal mendaftar. Pastikan URL GAS sudah disetting.');
+      }
+    });
+
+    document.getElementById('formPenilaian').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const payload = {
+        juri: document.getElementById('juri').value,
+        kodeLomba: document.getElementById('penilaianLomba').value,
+        idPeserta: document.getElementById('idPesertaPenilaian').value,
+        k1: document.getElementById('k1')?.value || 0,
+        k2: document.getElementById('k2')?.value || 0,
+        k3: document.getElementById('k3')?.value || 0,
+        k4: document.getElementById('k4')?.value || 0,
+        k5: document.getElementById('k5')?.value || 0,
+      };
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'simpan_nilai', payload })
+        }).then(r => r.json());
+
+        if(res.status === 'success') {
+          alert(`Penilaian Berhasil Disimpan!\nTotal Nilai: ${res.total}`);
+          this.reset();
+          document.getElementById('containerKriteria').innerHTML = '<p class="text-sm text-slate-500 text-center">Pilih cabang lomba untuk menampilkan kriteria penilaian.</p>';
+        }
+      } catch(err) {
+        alert('Gagal menyimpan nilai.');
+      }
+    });
+
+    async function loadRekap() {
+      const tbody = document.getElementById('tbodyRekap');
+      tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Memuat data rekap...</td></tr>';
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'get_data' })
+        });
+        const res = await response.json();
+        if (res.status === 'success') {
+          cachePeserta = res.peserta;
+          cacheNilai = res.nilai;
+          renderRekapTable();
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Gagal memuat rekapitulasi.</td></tr>';
+      }
+    }
+
+    function renderRekapTable() {
+      const tbody = document.getElementById('tbodyRekap');
+      const filter = document.getElementById('filterRekapLomba').value;
+      tbody.innerHTML = '';
+
+      // Hitung total rata-rata/akumulasi per peserta
+      let summary = cachePeserta.map(p => {
+        const listNilai = cacheNilai.filter(n => n.idPeserta === p.id);
+        const totalNilai = listNilai.reduce((acc, curr) => acc + curr.total, 0);
+        return { ...p, totalNilai };
+      });
+
+      if (filter !== 'ALL') {
+        summary = summary.filter(s => s.kodeLomba === filter);
+      }
+
+      summary.sort((a, b) => b.totalNilai - a.totalNilai);
+
+      if (summary.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Belum ada data nilai.</td></tr>';
+        return;
+      }
+
+      summary.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = index < 3 ? 'bg-amber-50 font-semibold' : 'hover:bg-slate-50';
+        tr.innerHTML = `
+          <td class="p-3 border-b">${index === 0 ? '🥇 Juara 1' : index === 1 ? '🥈 Juara 2' : index === 2 ? '🥉 Juara 3' : index + 1}</td>
+          <td class="p-3 border-b">${item.id}</td>
+          <td class="p-3 border-b">${item.nama}</td>
+          <td class="p-3 border-b">${item.kelas}</td>
+          <td class="p-3 border-b">[${item.kodeLomba}] ${item.namaLomba}</td>
+          <td class="p-3 border-b text-emerald-700 font-bold">${item.totalNilai}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
