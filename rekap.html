@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rekapitulasi Nilai - Hari Santri 2026 SD IT AL-IQRA</title>
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background-color: white !important; }
+      .print-shadow-none { shadow: none !important; border: 1px solid #cbd5e1 !important; }
+    }
+  </style>
+</head>
+<body class="bg-emerald-50 min-h-screen text-slate-800 font-sans pb-12">
+
+  <!-- Header Section -->
+  <header class="bg-emerald-700 text-white shadow-lg py-5 px-6 mb-6">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <img src="logo-sekolah.png" alt="Logo Sekolah" class="h-16 w-16 object-contain bg-white rounded-full p-1 shadow">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold uppercase tracking-wide">Papan Nilai & Rekapitulasi Juara</h1>
+          <p class="text-xs md:text-sm font-light text-emerald-100">Hari Santri Nasional 2026 — SD IT AL-IQRA</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <img src="logo-hari-santri.png" alt="Logo Hari Santri" class="h-16 w-16 object-contain bg-white rounded-full p-1 shadow">
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4">
+    
+    <!-- Top Control Panel (No Print) -->
+    <div class="no-print bg-white p-4 rounded-2xl shadow-md border border-emerald-100 mb-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      
+      <!-- Live Status & Auto Refresh Indicator -->
+      <div class="flex items-center gap-3">
+        <span class="flex h-3 w-3 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+        </span>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Status Data: <span id="lastUpdated" class="font-bold text-emerald-800">Memuat...</span></p>
+          <p class="text-[10px] text-slate-400">Pembaruan otomatis setiap 30 detik</p>
+        </div>
+      </div>
+
+      <!-- Filters & Actions -->
+      <div class="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center">
+        <!-- Search Box -->
+        <div class="relative min-w-[200px]">
+          <input type="text" id="searchRekap" oninput="renderRekap()" placeholder="Cari Santri / ID..." class="w-full border rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-2.5 top-2.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <!-- Filter Kelas -->
+        <select id="filterKelas" onchange="renderRekap()" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+          <option value="ALL">Semua Kelas</option>
+          <option value="Kelas 1A">Kelas 1A</option>
+          <option value="Kelas 1B">Kelas 1B</option>
+          <option value="Kelas 2A">Kelas 2A</option>
+          <option value="Kelas 2B">Kelas 2B</option>
+          <option value="Kelas 3A">Kelas 3A</option>
+          <option value="Kelas 3B">Kelas 3B</option>
+          <option value="Kelas 4A">Kelas 4A</option>
+          <option value="Kelas 4B">Kelas 4B</option>
+          <option value="Kelas 5A">Kelas 5A</option>
+          <option value="Kelas 5B">Kelas 5B</option>
+          <option value="Kelas 6A">Kelas 6A</option>
+          <option value="Kelas 6B">Kelas 6B</option>
+        </select>
+
+        <!-- Filter Lomba -->
+        <select id="filterLomba" onchange="renderRekap()" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+          <option value="ALL">Semua Cabang Lomba</option>
+          <option value="LMK">LMK - Mewarnai Kaligrafi</option>
+          <option value="LHQ">LHQ - Tahfizh</option>
+          <option value="LAZ">LAZ - Adzan & Iqomah</option>
+          <option value="LTQ">LTQ - Tilawatil Qur'an</option>
+          <option value="LPD">LPD - Pidato</option>
+          <option value="LSJ">LSJ - Sholat Berjama'ah</option>
+          <option value="LCC">LCC - Cerdas Cermat</option>
+        </select>
+
+        <!-- Action Buttons -->
+        <button onclick="loadDataFromGAS()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium text-sm px-3 py-2 rounded-lg transition">
+          🔄 Refresh
+        </button>
+
+        <button onclick="eksporKeCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-3 py-2 rounded-lg transition shadow">
+          📊 Excel/CSV
+        </button>
+
+        <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white font-medium text-sm px-3 py-2 rounded-lg transition shadow">
+          🖨️ Cetak
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Visualisation Charts (No Print) -->
+    <div class="no-print grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-md border border-emerald-100">
+        <h3 class="text-sm font-bold text-emerald-800 mb-3 flex items-center gap-2"><span>🏆</span> Ranking Perolehan Nilai Tertinggi</h3>
+        <div class="h-64 relative"><canvas id="chartTopNilai"></canvas></div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-md border border-emerald-100">
+        <h3 class="text-sm font-bold text-emerald-800 mb-3 flex items-center gap-2"><span>📌</span> Partisipasi Peserta per Cabang Lomba</h3>
+        <div class="h-64 relative flex items-center justify-center"><canvas id="chartDistribusiLomba"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Main Score Table -->
+    <div class="bg-white rounded-2xl shadow-md border border-emerald-100 overflow-hidden print-shadow-none">
+      <div class="p-5 border-b flex justify-between items-center bg-emerald-50/50">
+        <div>
+          <h3 class="font-bold text-emerald-900 text-lg">Papan Peringkat & Nilai Santri</h3>
+          <p class="text-xs text-slate-500">Menampilkan peringkat berdasarkan akumulasi penilaian dewan juri</p>
+        </div>
+        <span id="totalMatchCount" class="text-xs bg-emerald-700 text-white px-3 py-1 rounded-full font-semibold">0 Santri</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left border-collapse">
+          <thead class="bg-emerald-700 text-white uppercase text-xs">
+            <tr>
+              <th class="p-3 text-center w-24">Peringkat</th>
+              <th class="p-3">ID Peserta</th>
+              <th class="p-3">Nama Santri</th>
+              <th class="p-3">Kelas</th>
+              <th class="p-3">Cabang Lomba</th>
+              <th class="p-3 text-right">Total Nilai</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyRekap" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="p-6 text-center text-slate-500">Memuat data rekapitulasi dari Google Sheets...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // MASUKKAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz2dZUXikhiZBCvqimpD6LiuIqHvK9qu89J2EFiqeDLo0rd3b2FFqyU_HT9uyQRkAcy4g/exec";
+
+    let cachePeserta = [];
+    let cacheNilai = [];
+    let instanceChartTop = null;
+    let instanceChartDistribusi = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDataFromGAS();
+      // Auto refresh data setiap 30 detik
+      setInterval(loadDataFromGAS, 30000);
+    });
+
+    async function loadDataFromGAS() {
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'get_data' })
+        });
+        const res = await response.json();
+
+        if (res.status === 'success') {
+          cachePeserta = res.peserta;
+          cacheNilai = res.nilai;
+
+          const now = new Date();
+          document.getElementById('lastUpdated').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " WIB";
+
+          renderRekap();
+        }
+      } catch (err) {
+        document.getElementById('lastUpdated').textContent = "Gagal terhubung";
+      }
+    }
+
+    function renderRekap() {
+      const tbody = document.getElementById('tbodyRekap');
+      const filterLomba = document.getElementById('filterLomba').value;
+      const filterKelas = document.getElementById('filterKelas').value;
+      const searchQuery = document.getElementById('searchRekap').value.toLowerCase().trim();
+
+      tbody.innerHTML = '';
+
+      // Akumulasi total nilai per peserta
+      let summary = cachePeserta.map(p => {
+        const listNilai = cacheNilai.filter(n => n.idPeserta === p.id);
+        const totalNilai = listNilai.reduce((acc, curr) => acc + curr.total, 0);
+        return { ...p, totalNilai };
+      });
+
+      // Filter Cabang Lomba
+      if (filterLomba !== 'ALL') summary = summary.filter(s => s.kodeLomba === filterLomba);
+      
+      // Filter Kelas
+      if (filterKelas !== 'ALL') summary = summary.filter(s => s.kelas === filterKelas);
+
+      // Search Filter
+      if (searchQuery !== '') {
+        summary = summary.filter(s => 
+          s.nama.toLowerCase().includes(searchQuery) || 
+          s.id.toLowerCase().includes(searchQuery)
+        );
+      }
+
+      // Urutkan nilai tertinggi ke terendah
+      summary.sort((a, b) => b.totalNilai - a.totalNilai);
+
+      // Update badge jumlah santri
+      document.getElementById('totalMatchCount').textContent = `${summary.length} Santri`;
+
+      // Render Charts
+      updateCharts(summary, cachePeserta);
+
+      if (summary.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Tidak ada data rekapitulasi yang sesuai kriteria pencarian/filter.</td></tr>';
+        return;
+      }
+
+      // Render Rows
+      summary.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        
+        let rankBadge = index + 1;
+        let rowStyle = "hover:bg-slate-50";
+
+        if (index === 0) {
+          rankBadge = "🥇 Juara 1";
+          rowStyle = "bg-amber-100/60 font-semibold text-amber-900";
+        } else if (index === 1) {
+          rankBadge = "🥈 Juara 2";
+          rowStyle = "bg-slate-100 font-semibold text-slate-800";
+        } else if (index === 2) {
+          rankBadge = "🥉 Juara 3";
+          rowStyle = "bg-orange-100/50 font-semibold text-orange-900";
+        }
+
+        tr.className = rowStyle;
+        tr.innerHTML = `
+          <td class="p-3 text-center font-bold">${rankBadge}</td>
+          <td class="p-3 font-mono text-xs text-slate-500">${item.id}</td>
+          <td class="p-3 font-medium">${item.nama}</td>
+          <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">${item.kelas}</span></td>
+          <td class="p-3">[${item.kodeLomba}] ${item.namaLomba}</td>
+          <td class="p-3 text-right font-bold text-emerald-700 text-base">${item.totalNilai}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateCharts(dataSummary, totalPesertaAll) {
+      // 1. Bar Chart Top Scorers
+      const topData = dataSummary.slice(0, 8);
+      const labelsTop = topData.map(d => `${d.nama} (${d.kelas})`);
+      const valuesTop = topData.map(d => d.totalNilai);
+
+      const ctxTop = document.getElementById('chartTopNilai').getContext('2d');
+      if (instanceChartTop) instanceChartTop.destroy();
+
+      instanceChartTop = new Chart(ctxTop, {
+        type: 'bar',
+        data: {
+          labels: labelsTop,
+          datasets: [{
+            label: 'Total Nilai',
+            data: valuesTop,
+            backgroundColor: 'rgba(5, 150, 105, 0.8)',
+            borderColor: 'rgb(5, 150, 105)',
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Doughnut Chart Distribusi Lomba
+      const countPerLomba = {};
+      totalPesertaAll.forEach(p => {
+        countPerLomba[p.kodeLomba] = (countPerLomba[p.kodeLomba] || 0) + 1;
+      });
+
+      const labelsLomba = Object.keys(countPerLomba);
+      const valuesLomba = Object.values(countPerLomba);
+
+      const ctxDistribusi = document.getElementById('chartDistribusiLomba').getContext('2d');
+      if (instanceChartDistribusi) instanceChartDistribusi.destroy();
+
+      instanceChartDistribusi = new Chart(ctxDistribusi, {
+        type: 'doughnut',
+        data: {
+          labels: labelsLomba,
+          datasets: [{
+            data: valuesLomba,
+            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#34D399', '#6EE7B7', '#A7F3D0']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+
+    function eksporKeCSV() {
+      const filterLomba = document.getElementById('filterLomba').value;
+      const filterKelas = document.getElementById('filterKelas').value;
+
+      let summary = cachePeserta.map(p => {
+        const listNilai = cacheNilai.filter(n => n.idPeserta === p.id);
+        const totalNilai = listNilai.reduce((acc, curr) => acc + curr.total, 0);
+        return { ...p, totalNilai };
+      });
+
+      if (filterLomba !== 'ALL') summary = summary.filter(s => s.kodeLomba === filterLomba);
+      if (filterKelas !== 'ALL') summary = summary.filter(s => s.kelas === filterKelas);
+
+      summary.sort((a, b) => b.totalNilai - a.totalNilai);
+
+      if (summary.length === 0) {
+        alert("Tidak ada data rekapitulasi untuk diekspor!");
+        return;
+      }
+
+      const headers = ["Peringkat", "ID Peserta", "Nama Santri", "Kelas", "Kode Lomba", "Nama Lomba", "Total Nilai"];
+      const rows = summary.map((item, index) => [
+        `Juara ${index + 1}`,
+        `"${item.id}"`,
+        `"${item.nama.replace(/"/g, '""')}"`,
+        `"${item.kelas}"`,
+        `"${item.kodeLomba}"`,
+        `"${item.namaLomba.replace(/"/g, '""')}"`,
+        item.totalNilai
+      ]);
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      
+      const namaFile = `Rekap_HariSantri_2026_${filterKelas}_${filterLomba}.csv`.replace(/\s+/g, "_");
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", namaFile);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
