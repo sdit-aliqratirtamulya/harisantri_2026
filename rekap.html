@@ -81,6 +81,7 @@
         <select id="filterLomba" onchange="renderRekap()" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
           <option value="ALL">Semua Cabang Lomba</option>
           <option value="LMK">LMK - Mewarnai Kaligrafi</option>
+          <option value="LKG">LKG - Kaligrafi</option>
           <option value="LHQ">LHQ - Tahfizh</option>
           <option value="LAZ">LAZ - Adzan & Iqomah</option>
           <option value="LTQ">LTQ - Tilawatil Qur'an</option>
@@ -162,7 +163,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       loadDataFromGAS();
-      // Auto refresh data setiap 30 detik
       setInterval(loadDataFromGAS, 30000);
     });
 
@@ -196,20 +196,15 @@
 
       tbody.innerHTML = '';
 
-      // Akumulasi total nilai per peserta
       let summary = cachePeserta.map(p => {
         const listNilai = cacheNilai.filter(n => n.idPeserta === p.id);
         const totalNilai = listNilai.reduce((acc, curr) => acc + curr.total, 0);
         return { ...p, totalNilai };
       });
 
-      // Filter Cabang Lomba
       if (filterLomba !== 'ALL') summary = summary.filter(s => s.kodeLomba === filterLomba);
-      
-      // Filter Kelas
       if (filterKelas !== 'ALL') summary = summary.filter(s => s.kelas === filterKelas);
 
-      // Search Filter
       if (searchQuery !== '') {
         summary = summary.filter(s => 
           s.nama.toLowerCase().includes(searchQuery) || 
@@ -217,13 +212,9 @@
         );
       }
 
-      // Urutkan nilai tertinggi ke terendah
       summary.sort((a, b) => b.totalNilai - a.totalNilai);
-
-      // Update badge jumlah santri
       document.getElementById('totalMatchCount').textContent = `${summary.length} Santri`;
 
-      // Render Charts
       updateCharts(summary, cachePeserta);
 
       if (summary.length === 0) {
@@ -231,7 +222,6 @@
         return;
       }
 
-      // Render Rows
       summary.forEach((item, index) => {
         const tr = document.createElement('tr');
         
@@ -263,7 +253,6 @@
     }
 
     function updateCharts(dataSummary, totalPesertaAll) {
-      // 1. Bar Chart Top Scorers
       const topData = dataSummary.slice(0, 8);
       const labelsTop = topData.map(d => `${d.nama} (${d.kelas})`);
       const valuesTop = topData.map(d => d.totalNilai);
@@ -295,7 +284,6 @@
         }
       });
 
-      // 2. Doughnut Chart Distribusi Lomba
       const countPerLomba = {};
       totalPesertaAll.forEach(p => {
         countPerLomba[p.kodeLomba] = (countPerLomba[p.kodeLomba] || 0) + 1;
@@ -313,7 +301,7 @@
           labels: labelsLomba,
           datasets: [{
             data: valuesLomba,
-            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#34D399', '#6EE7B7', '#A7F3D0']
+            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#34D399', '#6EE7B7', '#A7F3D0', '#3B82F6']
           }]
         },
         options: {
