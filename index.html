@@ -102,6 +102,7 @@
             <select id="penilaianLomba" onchange="loadPesertaByLomba()" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none">
               <option value="">-- Pilih Cabang Lomba --</option>
               <option value="LMK">LMK - Mewarnai Kaligrafi (Kelas 1A-2B)</option>
+              <option value="LKG">LKG - Kaligrafi (Kelas 3A-6B)</option>
               <option value="LHQ">LHQ - Tahfizh (Kelas 1A-6B)</option>
               <option value="LAZ">LAZ - Adzan & Iqomah (Kelas 1A-6B)</option>
               <option value="LTQ">LTQ - Tilawatil Qur'an (Kelas 3A-6B)</option>
@@ -163,6 +164,7 @@
           <select id="filterRekapLomba" onchange="renderRekapTable()" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
             <option value="ALL">Semua Cabang Lomba</option>
             <option value="LMK">LMK - Mewarnai Kaligrafi</option>
+            <option value="LKG">LKG - Kaligrafi</option>
             <option value="LHQ">LHQ - Tahfizh</option>
             <option value="LAZ">LAZ - Adzan & Iqomah</option>
             <option value="LTQ">LTQ - Tilawatil Qur'an</option>
@@ -220,6 +222,7 @@
 
     const lombaData = {
       "LMK": { nama: "Mewarnai Kaligrafi", kat: ["Kelas 1A", "Kelas 1B", "Kelas 2A", "Kelas 2B"], kuota: 30, kriteria: ["Gradasi Warna", "Kebersihan", "Kerapihan"] },
+      "LKG": { nama: "Kaligrafi", kat: ["Kelas 3A", "Kelas 3B", "Kelas 4A", "Kelas 4B", "Kelas 5A", "Kelas 5B", "Kelas 6A", "Kelas 6B"], kuota: 20, kriteria: ["Kebenaran Kaidah", "Keindahan Khat", "Kerapihan & Kebersihan"] },
       "LHQ": { nama: "Tahfizh", kat: ["Kelas 1A", "Kelas 1B", "Kelas 2A", "Kelas 2B", "Kelas 3A", "Kelas 3B", "Kelas 4A", "Kelas 4B", "Kelas 5A", "Kelas 5B", "Kelas 6A", "Kelas 6B"], kuota: 25, kriteria: ["Tahfizh", "Tajwid", "Irama", "Adab"] },
       "LAZ": { nama: "Adzan & Iqomah", kat: ["Kelas 1A", "Kelas 1B", "Kelas 2A", "Kelas 2B", "Kelas 3A", "Kelas 3B", "Kelas 4A", "Kelas 4B", "Kelas 5A", "Kelas 5B", "Kelas 6A", "Kelas 6B"], kuota: 20, kriteria: ["Tajwid", "Irama", "Gestur"] },
       "LTQ": { nama: "Tilawatil Qur'an", kat: ["Kelas 3A", "Kelas 3B", "Kelas 4A", "Kelas 4B", "Kelas 5A", "Kelas 5B", "Kelas 6A", "Kelas 6B"], kuota: 15, kriteria: ["Tajwid", "Irama", "Adab"] },
@@ -556,7 +559,7 @@
           labels: labelsLomba,
           datasets: [{
             data: valuesLomba,
-            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#34D399', '#6EE7B7', '#A7F3D0']
+            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#34D399', '#6EE7B7', '#A7F3D0', '#3B82F6']
           }]
         },
         options: {
